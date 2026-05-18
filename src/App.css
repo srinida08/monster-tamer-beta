@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+#root { max-width: none; width: 100%; margin: 0; padding: 0; text-align: left; }
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #0f0f23;
+  color: #e8e8e8;
+  font-family: 'Press Start 2P', monospace;
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+
+.pixel-panel {
+  background: #16213e;
+  border: 4px solid #e8e8e8;
+  box-shadow: inset -4px -4px 0 0 #8888aa, inset 4px 4px 0 0 #ffffff, 8px 8px 0 0 rgba(0,0,0,0.5);
+  padding: 16px;
+}
+
+.pixel-panel-dark {
+  background: #0d0d2b;
+  border: 3px solid #555;
+  box-shadow: inset -3px -3px 0 0 #333, inset 3px 3px 0 0 #777;
+  padding: 12px;
+}
+
+.hp-bar-bg { height: 14px; background: #222; border: 2px solid #aaa; overflow: hidden; }
+.hp-bar-fill { height: 100%; transition: width 0.4s steps(10); }
+.hp-green { background: #22cc44; }
+.hp-yellow { background: #cccc22; }
+.hp-red { background: #cc2222; animation: hp-pulse 0.6s infinite; }
+.hp-blue { background: #2266cc; }
+
+@keyframes hp-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+.pixel-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 12px 24px;
+  background: #3344aa;
+  color: #fff;
+  border: 3px solid #fff;
+  box-shadow: inset -3px -3px 0 0 rgba(0,0,0,0.2), inset 3px 3px 0 0 rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.pixel-btn:hover { background: #4455cc; }
+.pixel-btn:active { box-shadow: inset 3px 3px 0 0 rgba(0,0,0,0.3); transform: translate(2px,2px); }
+.pixel-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pixel-btn.danger { background: #aa3344; }
+.pixel-btn.danger:hover { background: #cc4455; }
+.pixel-btn.success { background: #33aa44; }
+.pixel-btn.success:hover { background: #44cc55; }
+.pixel-btn.warning { background: #aa8833; }
+
+.skill-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 10px 12px;
+  background: #1a1a3e;
+  color: #ccc;
+  border: 2px solid #555;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: all 0.15s;
+}
+.skill-btn:hover { background: #252552; border-color: #aaa; color: #fff; }
+.skill-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+@keyframes encounter-flash { 0%{opacity:0} 20%{opacity:1} 40%{opacity:0} 60%{opacity:1} 80%{opacity:0} 100%{opacity:0} }
+@keyframes slide-up { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes bounce-in { 0%{transform:scale(0);opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+@keyframes float-anim { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+.shake { animation: shake 0.3s ease-in-out; }
+.slide-up { animation: slide-up 0.4s ease-out; }
+.bounce-in { animation: bounce-in 0.5s ease-out; }
+.float-anim { animation: float-anim 2s ease-in-out infinite; }
+
+.battle-log { max-height: 120px; overflow-y: auto; background: #0a0a18; border: 2px solid #444; padding: 8px; font-size: 8px; line-height: 2; }
+.battle-log-entry { padding: 2px 0; border-bottom: 1px solid #1a1a2e; }
+
+.game-hud { position: absolute; top: 8px; left: 8px; z-index: 10; }
+.quick-actions {
+  position: absolute; top: 8px; right: 8px; z-index: 10;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.quick-btn {
+  width: 44px; height: 44px; background: rgba(13,13,35,0.92); border: 3px solid #888;
+  font-size: 20px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; user-select: none; -webkit-user-select: none; transition: border-color 0.2s;
+}
+.quick-btn:hover { border-color: #fff; background: rgba(30,30,80,0.95); }
+.hud-panel { background: rgba(13,13,35,0.92); border: 3px solid #888; padding: 8px 12px; font-size: 8px; min-width: 160px; }
+.zone-banner {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 10;
+  background: rgba(0,0,0,0.85); border: 3px solid #888; padding: 6px 16px;
+  font-size: 9px; color: #ccc; white-space: nowrap; animation: slide-up 0.3s ease-out;
+}
+.controls-hint {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 10;
+  background: rgba(0,0,0,0.6); border: 2px solid #444; padding: 6px 12px; font-size: 7px; color: #666;
+}
+
+.dpad {
+  position: absolute; bottom: 20px; left: 20px; z-index: 20;
+  display: grid; grid-template-areas: '. up .' 'left . right' '. down .'; gap: 4px;
+}
+.dpad-btn {
+  width: 48px; height: 48px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+}
+.dpad-btn:active { background: rgba(255,255,255,0.35); }
+.dpad-up { grid-area: up; }
+.dpad-down { grid-area: down; }
+.dpad-left { grid-area: left; }
+.dpad-right { grid-area: right; }
+
+.dialog-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+
+.encounter-flash {
+  position: fixed; inset: 0; background: #fff; z-index: 50;
+  animation: encounter-flash 0.8s ease-out forwards; pointer-events: none;
+}
+
+.monster-card-px {
+  background: #16213e; border: 3px solid #555; padding: 10px;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.monster-card-px:hover { border-color: #aaa; background: #1c2748; }
+
+.el-fire { color: #ff6644; }
+.el-water { color: #44aaff; }
+.el-earth { color: #66cc44; }
+.el-wind { color: #66eedd; }
+.el-lightning { color: #ffcc22; }
+.el-shadow { color: #aa66ff; }
+.el-light { color: #ffee88; }
+
+.rarity-common { border-color: #666 !important; }
+.rarity-uncommon { border-color: #44cc44 !important; }
+.rarity-rare { border-color: #4488ff !important; }
+.rarity-epic { border-color: #aa44ff !important; }
+.rarity-legendary { border-color: #ffaa00 !important; box-shadow: 0 0 12px rgba(255,170,0,0.4); }
+
+.monster-sprite {
+  width: 96px; height: 96px; display: flex; align-items: center; justify-content: center;
+  font-size: 56px; border: 3px solid #fff; background: #0d0d2b;
+}
+.monster-sprite-sm {
+  width: 48px; height: 48px; font-size: 28px; border: 2px solid #888;
+  background: #16213e; display: flex; align-items: center; justify-content: center;
+}
+
+.capture-ball-px {
+  width: 48px; height: 48px; border: 3px solid #333;
+  background: linear-gradient(to bottom, #ee3333 50%, #eee 50%);
+  position: relative; animation: shake 0.4s ease-in-out infinite;
+}
+.capture-ball-px::after {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 12px; height: 12px; background: #eee; border: 3px solid #333;
+}
+
+.landing-input {
+  font-family: 'Press Start 2P', monospace; font-size: 10px; padding: 12px;
+  background: #1a1a3e; color: #e8e8e8; border: 3px solid #888; width: 100%; outline: none;
+}
+.landing-input:focus { border-color: #fff; background: #222252; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0a0a1a; }
+::-webkit-scrollbar-thumb { background: #444; border: 1px solid #666; }
+
+/* NPC Dialog */
+.npc-dialog-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 200; padding-bottom: 60px;
+}
+.npc-dialog {
+  background: #16213e; border: 4px solid #e8e8e8;
+  box-shadow: inset -4px -4px 0 0 #8888aa, inset 4px 4px 0 0 #ffffff, 8px 8px 0 0 rgba(0,0,0,0.5);
+  padding: 16px; max-width: 440px; width: 92%;
+}
+.npc-dialog-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+}
+.npc-avatar {
+  width: 40px; height: 40px; border: 3px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: bold; color: #fff;
+  font-family: 'Press Start 2P', monospace;
+}
+.npc-name { color: #ffcc44; font-size: 10px; }
+.npc-title { color: #888; font-size: 7px; margin-top: 2px; }
+.npc-chat-bubble {
+  background: #0d0d2b; border: 2px solid #555; padding: 12px;
+  margin-bottom: 12px; min-height: 48px;
+}
+.npc-chat-text { color: #ddd; font-size: 8px; line-height: 2; }
+.npc-duel-buttons {
+  display: flex; gap: 8px; justify-content: center;
+}
+.npc-duel-buttons .pixel-btn { font-size: 9px; padding: 10px 18px; }
+.npc-monster-preview {
+  margin-top: 10px; text-align: center;
+  padding-top: 8px; border-top: 1px solid #333;
+}
+
+/* Version badge */
+.version-badge {
+  position: fixed; bottom: 4px; right: 4px; z-index: 5;
+  font-size: 6px; color: #555; font-family: 'Press Start 2P', monospace;
+}
+.version-badge a { color: #6688cc; text-decoration: none; }
+.version-badge a:hover { color: #88aaff; text-decoration: underline; }
+
+@media (max-width: 768px) {
+  body { font-size: 8px; }
+  .pixel-panel { padding: 10px; }
+  .hud-panel { font-size: 7px; min-width: 120px; }
+  .monster-sprite { width: 72px; height: 72px; font-size: 40px; }
+  .dpad-btn { width: 40px; height: 40px; }
+  .npc-dialog { max-width: 360px; }
+  .npc-duel-buttons .pixel-btn { font-size: 8px; padding: 8px 14px; }
+}
